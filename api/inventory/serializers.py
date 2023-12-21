@@ -7,7 +7,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class InventoryItemSerializer(serializers.ModelSerializer):
-    # Change the field name to match the method
     category = serializers.SerializerMethodField()
 
     name = serializers.CharField(required=True)
@@ -24,7 +23,6 @@ class InventoryItemSerializer(serializers.ModelSerializer):
             "category",
         )
 
-    # Correct the method name here
     def get_category(self, obj):
         return obj.category.name
 
