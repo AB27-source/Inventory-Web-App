@@ -12,6 +12,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from '.env.local'
+load_dotenv(dotenv_path=Path('.') / '.env.local')
+
+
+# Load environment variables from '.env'
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,11 +29,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1fx5y&d@6sj$t8sll6a4c2@83a9wq$@c&63gssn#_&em8o-s7t'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') == 'True'  # This converts the string 'True' to a boolean True
 
 ALLOWED_HOSTS = ["*","localhost","127.0.0.1","[::1]",".vercel.app"]
 
@@ -76,7 +84,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {'default': dj_database_url.config(default='sqlite:///db.sqlite3')}
+DATABASES = {
+    'default': dj_database_url.config(default=os.getenv('POSTGRES_URL'))
+}
 
 
 # Password validation

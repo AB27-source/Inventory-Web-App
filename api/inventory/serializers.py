@@ -7,7 +7,10 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class InventoryItemSerializer(serializers.ModelSerializer):
-    category = serializers.SerializerMethodField()
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        required=True
+    )
 
     name = serializers.CharField(required=True)
     quantity = serializers.IntegerField(required=True)
@@ -23,8 +26,8 @@ class InventoryItemSerializer(serializers.ModelSerializer):
             "category",
         )
 
-    def get_category(self, obj):
-        return obj.category.name
+    # def get_category(self, obj):
+    #     return obj.category.name
 
     def validate(self, data):
         if data['quantity'] < 0:
