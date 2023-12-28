@@ -1,60 +1,42 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './themes';
 import "./index.css";
 
-// Material UI Example Components
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+// Importing components and pages
+import Root from "./pages/Root.jsx"
+import Login from './components/Login';
 
-// Placeholder components with Material UI
-const Home = () => (
-  <Container>
-    <Typography variant="h2">Home Page</Typography>
-    <Button variant="contained" color="primary">Welcome</Button>
-  </Container>
-);
+// Placeholder components for pages
+const Home = () => <div>Home Page</div>;
+const About = () => <div>About Page</div>;
+const Contact = () => <div>Contact Page</div>;
+const NotFound = () => <div>404 - Not Found</div>;
 
-const Inventory = () => (
-  <Container>
-    <Typography variant="h2">Inventory Page</Typography>
-  </Container>
-);
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "about", element: <About /> },
+      { path: "contact", element: <Contact /> },
+      { path: "login", element: <Login /> },
+    ],
+  },
+  // Catch-all route for 404 Not Found page
+  { path: "*", element: <NotFound /> },
+]);
 
-const Login = () => (
-  <Container>
-    <Typography variant="h2">Login Page</Typography>
-  </Container>
-);
-
-const NotFound = () => (
-  <Container>
-    <Typography variant="h2">404 - Not Found</Typography>
-  </Container>
-);
-
-function App() {
-  return (
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </ThemeProvider>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
   </React.StrictMode>
 );
