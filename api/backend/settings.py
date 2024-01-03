@@ -14,10 +14,10 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 import os
+import datetime
 
 # Load environment variables from '.env.local'
 load_dotenv(dotenv_path=Path('.') / '.env.local')
-
 
 # Load environment variables from '.env'
 load_dotenv()
@@ -71,6 +71,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
 }
 
 ROOT_URLCONF = 'backend.urls'
@@ -150,3 +155,11 @@ STORAGES = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'user_authentication.User'
+
+EMAIL_BACKEND = 'user_authentication.emailbackend.CustomEmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('OUTLOOK_EMAIL')
+EMAIL_HOST_PASSWORD = os.environ.get('OUTLOOK_EMAIL_PASSWORD')
