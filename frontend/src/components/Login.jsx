@@ -1,14 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
-import { useDarkMode } from "../pages/Root"
+import { BsMoon, BsSun } from "react-icons/bs";
+import { useDarkMode } from "./DarkModeProvider.jsx";
 
 function Login() {
-  const { darkMode } = useDarkMode();
+  const { darkMode, toggleDarkMode } = useDarkMode();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    const loginUrl = "http://localhost:8000/api/v1/auth/login/";
+
+    try {
+      const response = await axios.post(loginUrl, { email, password });
+      console.log("Login successful:", response.data);
+      navigate("/");
+    } catch (error) {
+      console.error(
+        "Login failed:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <section className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center">
+      <div className="w-full max-w-md px-6 py-8 mx-auto">
         <a
           href="#"
           className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
@@ -19,12 +41,24 @@ function Login() {
             alt="UB Hospitality Group logo"
           />
         </a>
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="relative w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="absolute bottom-2 right-2">
+            <button
+              onClick={toggleDarkMode}
+              className="text-gray-600 dark:text-gray-300"
+            >
+              {darkMode === "true" ? (
+                <BsSun fontSize={20} />
+              ) : (
+                <BsMoon fontSize={20} />
+              )}
+            </button>
+          </div>
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form className="space-y-4 md:space-y-6" onSubmit={handleLogin}>
               <div>
                 <label
                   htmlFor="email"
@@ -34,6 +68,8 @@ function Login() {
                 </label>
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   name="email"
                   id="email"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -50,6 +86,8 @@ function Login() {
                 </label>
                 <input
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   name="password"
                   id="password"
                   placeholder="••••••••"
@@ -78,6 +116,7 @@ function Login() {
                 </div>
                 <a
                   href="#"
+                  onClick={() => navigate('/forgot-password')}
                   className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Forgot password?
@@ -93,6 +132,7 @@ function Login() {
                 Don’t have an account yet?{" "}
                 <a
                   href="#"
+                  onClick={() => navigate('/signup')}
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Sign up

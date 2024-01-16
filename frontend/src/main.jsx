@@ -5,10 +5,15 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './themes';
 import "./index.css";
+import { DarkModeProvider } from './components/DarkModeProvider';
 
 // Importing components and pages
-import Root from "./pages/Root.jsx"
+import MainLayout from './components/MainLayout';
+import Root from './pages/Root';
 import Login from './components/Login';
+import ResetPassword from "./components/ResetPassword";
+import Signup from "./components/Signup";
+import VerifyEmail from './components/EmailVerification';
 
 // Placeholder components for pages
 const Home = () => <div>Home Page</div>;
@@ -18,25 +23,30 @@ const NotFound = () => <div>404 - Not Found</div>;
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Root />,
+    path: '/',
+    element: <MainLayout><Root /></MainLayout>, // Wrap Root with MainLayout
     children: [
       { index: true, element: <Home /> },
-      { path: "about", element: <About /> },
-      { path: "contact", element: <Contact /> },
-      { path: "login", element: <Login /> },
+      { path: 'about', element: <About /> },
+      { path: 'contact', element: <Contact /> },
+      // ...other routes
     ],
   },
-  // Catch-all route for 404 Not Found page
-  { path: "*", element: <NotFound /> },
+  { path: 'login', element: <Login /> },
+  { path: 'forgot-password', element: <ResetPassword /> },
+  { path: 'signup', element: <Signup /> },
+  { path: 'verify-email', element: <VerifyEmail /> },
+  { path: '*', element: <NotFound /> },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <DarkModeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </DarkModeProvider>
   </React.StrictMode>
 );

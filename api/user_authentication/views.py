@@ -37,42 +37,28 @@ class RegisterView(generics.GenericAPIView):
 
         token = RefreshToken.for_user(user).access_token
 
-        current_site = get_current_site(request).domain
-        absurl = f'http://{current_site}/api/v1/auth/email-verify/?token={str(token)}'
+        frontend_url = os.environ.get('FRONTEND_URL')
+        absurl = f'{frontend_url}/verify-email?token={str(token)}'
         email_body = f"""
         <center style='font-family: Arial, Helvetica, sans-serif;'>
-        <tr> 
-            <td style='color: #344054; font-size: 16px; font-family: inherit; font-weight: 400; line-height: 24px; word-wrap: break-word;'>
-                <br>
-                <br>
-                <h2 style='color: #344054;'>Welcome to UB Hospitality Group Inventory Management, {user.first_name} {user.last_name}</h2>
-                <br />
-                Your account is almost ready.
-                <br /><br />
-                <a href='{absurl}' target='_blank' style="text-decoration: none;">
-                    <div style='width: 20%; height: 100%; padding-left: 32px; padding-right: 32px; padding-top: 16px; padding-bottom: 16px; background: #135DFF; border-radius: 1px; justify-content: center; align-items: center; gap: 10px; display: inline-flex; border-radius: 5px 5px;'>
-                        <div style='text-align: center; color: white; font-size: 16px; font-weight: 400; line-height: 24px; word-wrap: break-word'>Activate your Account</div>
-                    </div>
-                </a>
-                <br />
-                <br />
-                You can also click or paste the following link into your browser:
-                <br />
-                <br />
-                <a href='{absurl}' target='_blank' style='text-decoration: none; font-size: 11px; line-height: 12px;  color: dodgerblue'>{absurl}</a>
-                <br /><br />
-                <div style='width: 100%; opacity: 0.60; color: #344054; font-weight: 400; word-wrap: break-word'>
-                    If you did not request account creation on UB Hospitality Group Inventory Management, ignore this email and the account will not be created.
+            <h2 style='color: #344054;'>Welcome to UB Hospitality Group Inventory Management, {user.first_name} {user.last_name}</h2>
+            <p>Your account is almost ready.</p>
+            <a href='{absurl}' target='_blank' style="text-decoration: none;">
+                <div style='margin: auto; padding: 16px 32px; background: #135DFF; border-radius: 5px; display: inline-block;'>
+                    <span style='text-align: center; color: white; font-size: 16px; font-weight: 400; line-height: 24px;'>
+                        Activate your Account
+                    </span>
                 </div>
-                <br />
-                <br />
-                <hr style='border-width: 1px;' />
-                <div style='width: 100%; opacity: 0.60; color: #344054;font-size: 12px; word-wrap: break-word'>
-                    Sent by UB Hospitality Group. 
-                    Reply to this email to contact us. <a href='' style='text-decoration: none; font-size: 12px; color: dodgerblue'>Unsubscribe</a>
-                </div>
-            </td>
-        </tr>
+            </a>
+            <p>You can also click or paste the following link into your browser:</p>
+            <a href='{absurl}' target='_blank' style='text-decoration: none; font-size: 11px; line-height: 12px; color: dodgerblue'>{absurl}</a>
+            <p style='opacity: 0.60; color: #344054; font-weight: 400;'>
+                If you did not request account creation on UB Hospitality Group Inventory Management, ignore this email and the account will not be created.
+            </p>
+            <hr style='border-width: 1px;' />
+            <p style='opacity: 0.60; color: #344054; font-size: 12px;'>
+                Sent by UB Hospitality Group. Reply to this email to contact us. <a href='' style='text-decoration: none; font-size: 12px; color: dodgerblue'>Unsubscribe</a>
+            </p>
         </center>
         """
 
@@ -88,21 +74,24 @@ class VerifyEmail(views.APIView):
     def get(self, request):
         token = request.GET.get('token')
         print(f"Token extracted from URL: {token}")
-        
+
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
-            user = User.objects.get(id=payload['user_id'])
-            if not user.is_verified:
-                user.is_verified = True
-                user.save()
+            try:
+                user = User.objects.get(id=payload['user_id'])
+                if not user.is_verified:
+                    user.is_verified = True
+                    user.save()
+                return CustomRedirect(f"{os.environ.get('FRONTEND_URL')}/verify-email?status=success")
 
-            return CustomRedirect(os.environ.get('FRONTEND_URL_LOGIN'))
+            except User.DoesNotExist:
+                return CustomRedirect(f"{os.environ.get('FRONTEND_URL')}/verify-email?status=user-not-found")
 
         except jwt.ExpiredSignatureError as e:
-            return CustomRedirect(f"{os.environ.get('FRONTEND_URL_LOGIN')}/token=expired")
+            return CustomRedirect(f"{os.environ.get('FRONTEND_URL')}/verify-email?status=token=expired")
 
         except jwt.exceptions.DecodeError as e:
-            return CustomRedirect(f"{os.environ.get('FRONTEND_URL_LOGIN')}/token=invalid")
+            return CustomRedirect(f"{os.environ.get('FRONTEND_URL')}/verify-email?status=token=invalid")
 
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
@@ -110,7 +99,12 @@ class LoginAPIView(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        user = serializer.validated_data['user']
+        return Response({
+            'tokens': user.tokens(),
+            'first_name': user.first_name,
+            'last_name': user.last_name
+        }, status=status.HTTP_200_OK)
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
