@@ -4,12 +4,14 @@ import axios from "axios";
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
 import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "./DarkModeProvider.jsx";
+import { useDarkMode } from "../components/DarkModeProvider.jsx";
+import useLocalStorage from "../utilities/useLocalStorage.jsx";
+import Slide from "@mui/material/Slide";
 
 function Login() {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useLocalStorage("userEmail", "");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (event) => {
@@ -19,6 +21,15 @@ function Login() {
     try {
       const response = await axios.post(loginUrl, { email, password });
       console.log("Login successful:", response.data);
+      // Store user data in local storage
+      localStorage.setItem(
+        "userData",
+        JSON.stringify({
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
+          tokens: response.data.tokens,
+        })
+      );
       navigate("/");
     } catch (error) {
       console.error(
@@ -30,6 +41,7 @@ function Login() {
 
   return (
     <section className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center">
+      {/* <Slide direction="left" in={true} mountOnEnter unmountOnExit> */}
       <div className="w-full max-w-md px-6 py-8 mx-auto">
         <a
           href="#"
@@ -115,8 +127,7 @@ function Login() {
                   </div>
                 </div>
                 <a
-                  href="#"
-                  onClick={() => navigate('/forgot-password')}
+                  onClick={() => navigate("/forgot-password")}
                   className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Forgot password?
@@ -131,8 +142,7 @@ function Login() {
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet?{" "}
                 <a
-                  href="#"
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate("/signup")}
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Sign up
@@ -142,6 +152,7 @@ function Login() {
           </div>
         </div>
       </div>
+      {/* </Slide> */}
     </section>
   );
 }

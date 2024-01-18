@@ -4,7 +4,7 @@ import axios from "axios";
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
 import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "./DarkModeProvider.jsx";
+import { useDarkMode } from "../components/DarkModeProvider.jsx";
 
 function Signup() {
   const { darkMode, toggleDarkMode } = useDarkMode();

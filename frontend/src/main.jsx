@@ -10,9 +10,9 @@ import { DarkModeProvider } from './components/DarkModeProvider';
 // Importing components and pages
 import MainLayout from './components/MainLayout';
 import Root from './pages/Root';
-import Login from './components/Login';
-import ResetPassword from "./components/ResetPassword";
-import Signup from "./components/Signup";
+import Login from './pages/Login';
+import ResetPassword from "./pages/ResetPassword";
+import Signup from "./pages/Signup";
 import VerifyEmail from './components/EmailVerification';
 
 // Placeholder components for pages

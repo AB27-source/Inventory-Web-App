@@ -3,6 +3,7 @@ import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
 import { BsMoon, BsSun } from "react-icons/bs";
 import { useDarkMode } from "./DarkModeProvider.jsx";
+import AccountMenu from './AccountMenu.jsx'; // Import AccountMenu component
 
 const Navbar = () => {
   const { darkMode, toggleDarkMode } = useDarkMode();
@@ -11,6 +12,7 @@ const Navbar = () => {
 
   const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -28,7 +30,8 @@ const Navbar = () => {
                 : <BsMoon fontSize={20} />
               }
             </button>
-            {/* User menu and mobile menu button */}
+            {/* Place AccountMenu here */}
+            <AccountMenu />
         </div>
         {/* Mobile menu */}
       </div>

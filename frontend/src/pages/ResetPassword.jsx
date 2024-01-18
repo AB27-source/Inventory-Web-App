@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "./DarkModeProvider.jsx";
+import { useDarkMode } from "../components/DarkModeProvider.jsx";
 import { useNavigate } from "react-router-dom";
 
 function ResetPassword() {
