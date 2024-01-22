@@ -7,6 +7,7 @@ import { BsMoon, BsSun } from "react-icons/bs";
 import { useDarkMode } from "../components/DarkModeProvider.jsx";
 import useLocalStorage from "../utilities/useLocalStorage.jsx";
 import Slide from "@mui/material/Slide";
+import { useAuth } from "../utilities/AuthProvider.jsx";
 
 function Login() {
   const { darkMode, toggleDarkMode } = useDarkMode();
@@ -14,29 +15,12 @@ function Login() {
   const [email, setEmail] = useLocalStorage("userEmail", "");
   const [password, setPassword] = useState("");
 
+  const { authProviderLogin } = useAuth();
+
   const handleLogin = async (event) => {
     event.preventDefault();
-    const loginUrl = "http://localhost:8000/api/v1/auth/login/";
-
-    try {
-      const response = await axios.post(loginUrl, { email, password });
-      console.log("Login successful:", response.data);
-      // Store user data in local storage
-      localStorage.setItem(
-        "userData",
-        JSON.stringify({
-          first_name: response.data.first_name,
-          last_name: response.data.last_name,
-          tokens: response.data.tokens,
-        })
-      );
-      navigate("/");
-    } catch (error) {
-      console.error(
-        "Login failed:",
-        error.response ? error.response.data : error.message
-      );
-    }
+    await authProviderLogin(email, password);
+    navigate("/");
   };
 
   return (

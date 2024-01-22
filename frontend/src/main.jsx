@@ -15,6 +15,9 @@ import ResetPassword from "./pages/ResetPassword";
 import Signup from "./pages/Signup";
 import VerifyEmail from './components/EmailVerification';
 
+// Importing utilities
+import { AuthProvider } from './utilities/AuthProvider';
+
 // Placeholder components for pages
 const Home = () => <div>Home Page</div>;
 const About = () => <div>About Page</div>;
@@ -29,7 +32,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'about', element: <About /> },
       { path: 'contact', element: <Contact /> },
-      // ...other routes
+      
     ],
   },
   { path: 'login', element: <Login /> },
@@ -42,11 +45,13 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <DarkModeProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ThemeProvider>
-    </DarkModeProvider>
+    <AuthProvider>
+      <DarkModeProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </DarkModeProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

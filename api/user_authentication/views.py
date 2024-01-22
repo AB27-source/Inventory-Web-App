@@ -103,7 +103,8 @@ class LoginAPIView(generics.GenericAPIView):
         return Response({
             'tokens': user.tokens(),
             'first_name': user.first_name,
-            'last_name': user.last_name
+            'last_name': user.last_name,
+            'email': user.email
         }, status=status.HTTP_200_OK)
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
