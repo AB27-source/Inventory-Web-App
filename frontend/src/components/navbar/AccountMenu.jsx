@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../utilities/AuthProvider.jsx';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../utilities/AuthProvider.jsx";
 
 export default function AccountMenu() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { username, email, authProviderLogout } = useAuth();
 
-  const fullName = username || 'Unknown User';
-  const userEmail = email || 'user@example.com';
+  const fullName = username || "Unknown User";
+  const userEmail = email || "user@example.com";
 
   const handleLogout = async () => {
     setIsDropdownOpen(false);
     authProviderLogout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -24,20 +24,29 @@ export default function AccountMenu() {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="cursor-pointer w-10 h-10 rounded-full flex items-center justify-center text-white bg-gray-700"
       >
-        {fullName.split(' ').map(n => n[0]).join('')}
+        {fullName
+          .split(" ")
+          .map((n) => n[0])
+          .join("")}
       </div>
 
       {/* Dropdown Menu */}
       {isDropdownOpen && (
-        <div id="userDropdown" className="absolute right-0 mt-2 py-1 bg-white rounded-lg shadow w-48 dark:bg-gray-700 z-10">
+        <div
+          id="userDropdown"
+          className="absolute right-0 mt-2 py-1 bg-white rounded-lg shadow min-w-max dark:bg-gray-700 z-10"
+        >
           <div className="block px-4 py-2 text-sm text-gray-900 dark:text-white">
-            <div className="font-bold">{fullName}</div>
-            <div className="text-gray-500">{userEmail}</div>
+            <div className="font-bold break-all">{fullName}</div>
+            <div className="text-gray-500 break-all">{userEmail}</div>
           </div>
-          <hr className="border-gray-200 dark:border-gray-600" /> {/* Style for divider */}
+          <hr className="border-gray-200 dark:border-gray-600" />
           <ul className="text-sm text-gray-700 dark:text-gray-200">
             <li>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+              <a
+                href="#"
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+              >
                 Settings
               </a>
             </li>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
 import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "./DarkModeProvider.jsx";
+import { useDarkMode } from "../DarkModeProvider.jsx";
 import AccountMenu from './AccountMenu.jsx'; // Import AccountMenu component
 
 const Navbar = () => {
