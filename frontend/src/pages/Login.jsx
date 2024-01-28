@@ -1,31 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
-import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "../components/DarkModeProvider.jsx";
+import { useDarkMode } from "../utilities/DarkModeProvider.jsx";
 import useLocalStorage from "../utilities/useLocalStorage.jsx";
-import Slide from "@mui/material/Slide";
 import { useAuth } from "../utilities/AuthProvider.jsx";
+import DarkModeToggle from "../utilities/DarkModeToggle.jsx";
 
 function Login() {
-  const { darkMode, toggleDarkMode } = useDarkMode();
+  const { currentTheme } = useDarkMode();
   const navigate = useNavigate();
   const [email, setEmail] = useLocalStorage("userEmail", "");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(""); // State to handle login errors
 
   const { authProviderLogin } = useAuth();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    await authProviderLogin(email, password);
-    navigate("/");
+    const loginResponse = await authProviderLogin(email, password);
+    if (loginResponse === true) {
+      navigate("/");
+    } else {
+      setLoginError(loginResponse); // Set the error message
+    }
   };
-
+  
   return (
     <section className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center">
-      {/* <Slide direction="left" in={true} mountOnEnter unmountOnExit> */}
       <div className="w-full max-w-md px-6 py-8 mx-auto">
         <a
           href="#"
@@ -33,22 +35,13 @@ function Login() {
         >
           <img
             className="mx-auto h-20 w-auto"
-            src={darkMode === "true" ? UBLogoDark : UBLogoLight}
+            src={currentTheme === "dark" ? UBLogoDark : UBLogoLight}
             alt="UB Hospitality Group logo"
           />
         </a>
         <div className="relative w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="absolute bottom-2 right-2">
-            <button
-              onClick={toggleDarkMode}
-              className="text-gray-600 dark:text-gray-300"
-            >
-              {darkMode === "true" ? (
-                <BsSun fontSize={20} />
-              ) : (
-                <BsMoon fontSize={20} />
-              )}
-            </button>
+            <DarkModeToggle />
           </div>
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -136,7 +129,6 @@ function Login() {
           </div>
         </div>
       </div>
-      {/* </Slide> */}
     </section>
   );
 }

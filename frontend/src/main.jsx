@@ -1,19 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from './themes';
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+// import CssBaseline from '@mui/material/CssBaseline';
+import { useEffect } from 'react';
 import "./index.css";
-import { DarkModeProvider } from './components/DarkModeProvider';
+import { DarkModeProvider } from './utilities/DarkModeProvider';
 
 // Importing components and pages
-import MainLayout from './components/MainLayout';
-import Root from './pages/Root';
 import Login from './pages/Login';
 import ResetPassword from "./pages/ResetPassword";
 import Signup from "./pages/Signup";
 import VerifyEmail from './components/EmailVerification';
+import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
 
 // Importing utilities
 import { AuthProvider } from './utilities/AuthProvider';
@@ -24,33 +23,38 @@ const About = () => <div>About Page</div>;
 const Contact = () => <div>Contact Page</div>;
 const NotFound = () => <div>404 - Not Found</div>;
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <MainLayout><Root /></MainLayout>, // Wrap Root with MainLayout
-    children: [
-      { index: true, element: <Home /> },
-      { path: 'about', element: <About /> },
-      { path: 'contact', element: <Contact /> },
-      
-    ],
-  },
-  { path: 'login', element: <Login /> },
-  { path: 'forgot-password', element: <ResetPassword /> },
-  { path: 'signup', element: <Signup /> },
-  { path: 'verify-email', element: <VerifyEmail /> },
-  { path: '*', element: <NotFound /> },
-]);
+// Custom hook for scrolling to top on route change
+function useScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+}
+
+function App() {
+  useScrollToTop();
+
+  return (
+    <Routes>
+      <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="login" element={<Login />} />
+      <Route path="forgot-password" element={<ResetPassword />} />
+      <Route path="signup" element={<Signup />} />
+      <Route path="verify-email" element={<VerifyEmail />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <AuthProvider>
       <DarkModeProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <RouterProvider router={router} />
-        </ThemeProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </DarkModeProvider>
     </AuthProvider>
   </React.StrictMode>

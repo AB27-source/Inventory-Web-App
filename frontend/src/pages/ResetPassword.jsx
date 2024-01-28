@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "../components/DarkModeProvider.jsx";
+import { useDarkMode } from "../utilities/DarkModeProvider.jsx";
 import { useNavigate } from "react-router-dom";
+import DarkModeToggle from "../utilities/DarkModeToggle.jsx";
 
 function ResetPassword() {
-  const { darkMode, toggleDarkMode } = useDarkMode();
+  const { currentTheme } = useDarkMode(); 
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate(); // Create a navigate function for navigation
@@ -70,16 +70,7 @@ function ResetPassword() {
             >
               Back to Login
             </button>
-            <button
-              onClick={toggleDarkMode}
-              className="text-gray-600 dark:text-gray-300"
-            >
-              {darkMode === "true" ? (
-                <BsSun fontSize={20} />
-              ) : (
-                <BsMoon fontSize={20} />
-              )}
-            </button>
+            <DarkModeToggle />
           </div>
         </div>
       </div>

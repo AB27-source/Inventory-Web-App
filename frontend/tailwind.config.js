@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin');
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
@@ -57,5 +59,14 @@ export default {
       ],
     },
   },
-  plugins: [require("@tailwindcss/forms"), require("flowbite/plugin")],
+  plugins: [
+    require("@tailwindcss/forms"), 
+    require("flowbite/plugin"),
+    plugin(({ addVariant, e }) => {
+      addVariant('sidebar-expanded', ({ modifySelectors, separator }) => {
+        modifySelectors(({ className }) => `.sidebar-expanded .${e(`sidebar-expanded${separator}${className}`)}`);
+      });
+    }),
+  ],
+  
 };

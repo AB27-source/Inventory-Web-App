@@ -5,6 +5,15 @@
     <!-- <link rel="icon" type="image/svg+xml" href="/icon.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UB Inventory Management</title>
+    <script>
+      if (localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme')) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

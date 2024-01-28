@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
-import { BsMoon, BsSun } from "react-icons/bs";
-import { useDarkMode } from "../components/DarkModeProvider.jsx";
+import { useDarkMode } from "../utilities/DarkModeProvider.jsx";
+import DarkModeToggle from "../utilities/DarkModeToggle.jsx";
 
 function Signup() {
-  const { darkMode, toggleDarkMode } = useDarkMode();
+  const { currentTheme } = useDarkMode(); 
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -44,7 +44,7 @@ function Signup() {
         >
           <img
             className="mx-auto h-20 w-auto"
-            src={darkMode === "true" ? UBLogoDark : UBLogoLight}
+            src={currentTheme === "dark" ? UBLogoDark : UBLogoLight}
             alt="UB Hospitality Group logo"
           />
         </a>
@@ -144,12 +144,7 @@ function Signup() {
             </button>
 
             {/* Dark mode toggle button */}
-            <button
-              onClick={toggleDarkMode}
-              className="text-gray-600 dark:text-gray-300"
-            >
-              {darkMode === "true" ? <BsSun fontSize={20} /> : <BsMoon fontSize={20} />}
-            </button>
+            <DarkModeToggle />
           </div>
         </div>
       </div>
