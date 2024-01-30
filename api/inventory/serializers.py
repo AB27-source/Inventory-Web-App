@@ -7,11 +7,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description']
 
 class InventoryItemSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(),
-        required=True
-    )
-
+    category = serializers.SlugRelatedField(
+            queryset=Category.objects.all(),
+            slug_field='name',
+            required=True
+        )
     name = serializers.CharField(required=True)
     quantity = serializers.IntegerField(required=True)
     price = serializers.DecimalField(required=True, max_digits=10, decimal_places=2)
@@ -24,6 +24,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
             "quantity",
             "price",
             "category",
+            "last_updated",
         )
 
     # def get_category(self, obj):
