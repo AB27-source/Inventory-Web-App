@@ -46,9 +46,10 @@ export default function AccountMenu() {
             .join("")}
         </div>
         <div className="flex items-center truncate">
-          <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
+          <span className="truncate ml-2 text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-slate-400 dark:group-hover:text-white">
             {fullName}
           </span>
+
           <svg
             className="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400"
             viewBox="0 0 12 12"
@@ -67,7 +68,7 @@ export default function AccountMenu() {
         leave="transition ease-in duration-75"
         leaveStart="opacity-100 scale-100"
         leaveEnd="opacity-0 scale-95"
-        className="origin-top-right z-10 absolute top-full right-0 min-w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded shadow-lg overflow-hidden mt-1"
+        className="origin-top-right z-10 absolute top-full right-0 min-w-44 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded shadow-lg overflow-hidden mt-1"
       >
         <div className="py-1 bg-white shadow min-w-max dark:bg-gray-700 z-10">
           <div className="block px-4 py-2 text-sm text-gray-900 dark:text-white">

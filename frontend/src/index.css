@@ -6,12 +6,16 @@
 @tailwind components;
 @tailwind utilities;
 
-*,
-button {
-  font-family: 'Poppins', sans-serif;
-  scroll-behavior: smooth;
+/* Set base styles for the application */
+@layer base {
+  body {
+    @apply bg-slate-200 dark:bg-slate-900;
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+  }
 }
 
+/* Extend your dark mode styles if needed */
 .dark {
-  @apply bg-zinc-900 text-zinc-100
+  @apply bg-zinc-900 text-zinc-100;
 }
