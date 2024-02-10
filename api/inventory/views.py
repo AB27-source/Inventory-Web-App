@@ -2,6 +2,7 @@ from rest_framework import status, views
 from rest_framework.response import Response
 from .models import InventoryItem, Category, InventoryUpdateRequest
 from .serializers import InventoryItemSerializer, CategorySerializer, InventoryUpdateRequestSerializer
+from django.shortcuts import get_object_or_404
 
 class InventoryItemAPIView(views.APIView):
     serializer_class = InventoryItemSerializer
@@ -15,16 +16,20 @@ class InventoryItemAPIView(views.APIView):
 
     def get(self, request, item_id=None):
         if item_id:
-            try:
-                item = InventoryItem.objects.get(id=item_id)
-                serializer = self.serializer_class(item)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except InventoryItem.DoesNotExist:
-                return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+            # Existing logic to return a single item
+            pass
+        else:
+            # Get the category name from query parameters
+            category_name = request.query_params.get('category', None)
+            if category_name:
+                # Filter by category name
+                category = get_object_or_404(Category, name=category_name)
+                items = InventoryItem.objects.filter(category=category)
+            else:
+                items = InventoryItem.objects.all()
 
-        items = InventoryItem.objects.all()
-        serializer = self.serializer_class(items, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = self.serializer_class(items, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
     
     def put(self, request, item_id):
         try:

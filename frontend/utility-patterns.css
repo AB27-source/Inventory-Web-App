@@ -131,7 +131,7 @@ input[type="search"]::-webkit-search-results-decoration {
     @apply bg-slate-400 dark:bg-slate-600;
 }
 
-/* Chrome, Safari and Opera */
+/* Custom scrollbar styles */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -139,4 +139,28 @@ input[type="search"]::-webkit-search-results-decoration {
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(107, 114, 128, 0.75);
+    border-radius: 20px;
+}
+
+/* Hover styles for the scrollbar thumb */
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(75, 85, 99, 0.75);
+}
+
+/* Style scrollbar corner to match the dark theme */
+.scrollbar-thin::-webkit-scrollbar-corner {
+    display: none;
 }

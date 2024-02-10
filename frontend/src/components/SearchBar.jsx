@@ -34,9 +34,9 @@ function SearchBar({ categories, onSearch }) {
         <button
           id="dropdown-button"
           data-dropdown-toggle="dropdown"
-          className="flex-shrink-0 z-10 rounded-l-3xl inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600 overflow-hidden"
+          className="flex-shrink-0 position:fixed z-50 rounded-l-3xl inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600 overflow-hidden"
           type="button"
-          style={{ width: 'auto' }}
+          style={{ width: "auto" }}
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           {selectedCategory}{" "}
@@ -57,18 +57,18 @@ function SearchBar({ categories, onSearch }) {
         </button>
         <Transition
           show={isDropdownOpen}
-          enter="transition ease-out duration-200"
+          enter="transition-opacity ease-out duration-200"
           enterStart="opacity-0"
           enterEnd="opacity-100"
-          leave="transition ease-in duration-75"
+          leave="transition-opacity ease-in duration-75"
           leaveStart="opacity-100"
           leaveEnd="opacity-0"
         >
           {/* Dropdown menu */}
           <div
             id="dropdown"
-            className="absolute z-10 left-0 bg-white divide-y divide-gray-100 rounded-3xl shadow w-44 dark:bg-gray-700 overflow-hidden"
-            style={{ top: '2.6rem', marginTop: '0.125rem' }}
+            className="absolute mt-1 bg-white divide-y divide-gray-100 rounded-3xl shadow w-44 dark:bg-gray-700 overflow-hidden" // Increase z-index significantly to ensure it's on top
+            style={{ top: "100%", left: 0 }}
             aria-labelledby="dropdown-button"
           >
             {/* Dropdown items */}

@@ -13,6 +13,7 @@ urlpatterns = [
     # Inventory Items
     path(f'{base_url}/inventory/items/', InventoryItemAPIView.as_view(), name='inventory_items'),
     path(f'{base_url}/inventory/items/<int:item_id>/', InventoryItemAPIView.as_view(), name='inventory_item_detail'),
+    path(f'{base_url}/inventory/items/category/<str:category_name>/', InventoryItemAPIView.as_view(), name='inventory_items_by_category'),
 
     # Categories
     path(f'{base_url}/inventory/categories/', CategoryAPIView.as_view(), name='categories'),

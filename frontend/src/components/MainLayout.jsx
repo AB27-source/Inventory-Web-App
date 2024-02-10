@@ -9,7 +9,7 @@ const MainLayout = ({ children }) => {
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-grow min-h-screen">{children}</main>
+        <main className="flex-grow h-dvh sm:pt-10">{children}</main>
       </div>
     </div>
   );
