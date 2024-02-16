@@ -2,28 +2,77 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
 import API from "../utilities/Axios";
-import { FaSort } from "react-icons/fa"; // Make sure to import FaSort
+import EditModal from "../components/EditModal";
+import ConfirmDeleteModal from "../components/DeleteButton";
+import { deleteInventoryItem } from "../utilities/InventoryAPI";
+import { FaSort } from "react-icons/fa";
 
 const InventoryManagement = () => {
   const { category } = useParams();
   const navigate = useNavigate();
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+
+  const openEditModal = (item) => {
+    setCurrentItem(item);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const saveItem = (updatedItem) => {
+    setInventoryItems((prevItems) =>
+      prevItems.map((item) => (item.id === updatedItem.id ? updatedItem : item))
+    );
+    closeEditModal();
+  };
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  const openConfirmModal = (itemId) => {
+    setItemToDelete(itemId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (itemToDelete) {
+      try {
+        await deleteInventoryItem(itemToDelete);
+        setInventoryItems((prevItems) =>
+          prevItems.filter((item) => item.id !== itemToDelete)
+        );
+        closeConfirmModal();
+      } catch (error) {
+        console.error("Error deleting inventory item:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
       try {
-        // Note the use of params here to pass the category as a query parameter
-        const response = await API.get(`/inventory/items/`, { params: { category: category } });
+        const response = await API.get(`/inventory/items/`, {
+          params: { category: category },
+        });
         setInventoryItems(response.data);
       } catch (error) {
-        console.error('Error fetching inventory items:', error);
+        console.error("Error fetching inventory items:", error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchItems();
   }, [category]);
 
@@ -33,6 +82,12 @@ const InventoryManagement = () => {
 
   return (
     <MainLayout>
+      <EditModal
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        item={currentItem}
+        onSave={saveItem}
+      />
       <div className="p-4 sm:px-6 lg:px-8">
         <h1 className="text-lg leading-6 font-medium text-black dark:text-white">
           Inventory Management - {category}
@@ -72,15 +127,13 @@ const InventoryManagement = () => {
                     <td className="px-6 py-4">{item.category}</td>
                     <td className="px-6 py-4 flex items-center">
                       <button
-                        onClick={() => navigate(`/edit-item/${item.id}`)}
+                        onClick={() => openEditModal(item)}
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => {
-                          /* Function to handle delete */
-                        }}
+                        onClick={() => openConfirmModal(item.id)}
                         className="font-medium text-red-600 dark:text-red-500 hover:underline ml-3"
                       >
                         Delete
@@ -93,6 +146,12 @@ const InventoryManagement = () => {
           </div>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={isConfirmModalOpen}
+        onClose={closeConfirmModal}
+        onConfirm={handleDeleteConfirm}
+        itemName={currentItem ? currentItem.name : ""}
+      />
     </MainLayout>
   );
 };
