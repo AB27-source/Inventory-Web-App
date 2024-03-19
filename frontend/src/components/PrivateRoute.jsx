@@ -10,6 +10,8 @@ function PrivateRoute({ children }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  console.log('Signed in as: ', user);
+
   return children;
 }
 

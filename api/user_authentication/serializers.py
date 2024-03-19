@@ -33,6 +33,7 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255, min_length=3)
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     tokens = serializers.SerializerMethodField()
+    role = serializers.CharField(source='user.role', read_only=True)
 
     def get_tokens(self, obj):
         user = User.objects.get(email=obj['email'])
@@ -51,7 +52,8 @@ class LoginSerializer(serializers.Serializer):
             return {
                 'email': user.email,
                 'tokens': user.tokens(),
-                'user': user
+                'user': user,
+                'role': user.role
             }
         raise AuthenticationFailed('Invalid credentials, try again')
 

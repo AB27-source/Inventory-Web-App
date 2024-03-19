@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../utilities/AuthProvider";
 import MainLayout from "../components/MainLayout";
 import API from "../utilities/Axios";
 import EditModal from "../components/EditModal";
 import ConfirmDeleteModal from "../components/DeleteButton";
 import { deleteInventoryItem } from "../utilities/InventoryAPI";
+import SkeletonLoader from "../components/SkeletonLoader";
 import { FaSort } from "react-icons/fa";
 
 const InventoryManagement = () => {
@@ -14,6 +16,7 @@ const InventoryManagement = () => {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
+  const { role } = useAuth();
 
   const openEditModal = (item) => {
     setCurrentItem(item);
@@ -76,9 +79,9 @@ const InventoryManagement = () => {
     fetchItems();
   }, [category]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <SkeletonLoader />;
+  // }
 
   return (
     <MainLayout>
@@ -125,19 +128,25 @@ const InventoryManagement = () => {
                     <td className="px-6 py-4">{item.quantity}</td>
                     <td className="px-6 py-4">${item.price}</td>
                     <td className="px-6 py-4">{item.category}</td>
-                    <td className="px-6 py-4 flex items-center">
+                    <td
+                      className={`px-6 py-4 ${
+                        role !== "employee" ? "flex justify-between" : ""
+                      }`}
+                    >
                       <button
                         onClick={() => openEditModal(item)}
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-auto"
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={() => openConfirmModal(item.id)}
-                        className="font-medium text-red-600 dark:text-red-500 hover:underline ml-3"
-                      >
-                        Delete
-                      </button>
+                      {role !== "employee" && (
+                        <button
+                          onClick={() => openConfirmModal(item.id)}
+                          className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

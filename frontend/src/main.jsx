@@ -15,6 +15,8 @@ import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import InventoryManagement from "./pages/InventoryManager";
 
+import { UpdateRequestTest } from "./pages/UpdateRequestTest";
+
 // Importing utilities
 import { AuthProvider } from './utilities/AuthProvider';
 
@@ -40,6 +42,7 @@ function App() {
     <Routes>
       <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/inventory-management/:category" element={<PrivateRoute><InventoryManagement /></PrivateRoute>} />
+      <Route path="/update-request-test" element={<PrivateRoute> <UpdateRequestTest /> </PrivateRoute>} />
       <Route path="login" element={<Login />} />
       <Route path="forgot-password" element={<ResetPassword />} />
       <Route path="signup" element={<Signup />} />

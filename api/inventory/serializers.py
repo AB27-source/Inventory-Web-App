@@ -40,12 +40,16 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
 class InventoryUpdateRequestSerializer(serializers.ModelSerializer):
     item = serializers.PrimaryKeyRelatedField(queryset=InventoryItem.objects.all())
-    submitted_by = serializers.ReadOnlyField(source='submitted_by.username')
+    submitted_by_username = serializers.ReadOnlyField(source='submitted_by.email')
+    submitted_by_first_name = serializers.ReadOnlyField(source='submitted_by.first_name')
+    submitted_by_last_name = serializers.ReadOnlyField(source='submitted_by.last_name')
     approved_by = serializers.ReadOnlyField(source='approved_by.username')
 
     class Meta:
         model = InventoryUpdateRequest
         fields = [
-            'id', 'item', 'requested_quantity', 'submitted_by', 
+            'id', 'item', 'requested_quantity', 'submitted_by_username', 
+            'submitted_by_first_name', 'submitted_by_last_name',
             'approved_by', 'status', 'created_at', 'approved_at'
         ]
+

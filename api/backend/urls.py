@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib import admin
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from inventory.views import InventoryItemAPIView, CategoryAPIView, InventoryUpdateRequestAPIView
+from inventory.views import InventoryItemAPIView, CategoryAPIView, InventoryUpdateRequestAPIView, InventoryRequestActionAPIView
 from user_authentication import views as authentication_views
 
 base_url = 'api/v1'
@@ -22,6 +22,8 @@ urlpatterns = [
     # Inventory Update Requests
     path(f'{base_url}/inventory/requests/', InventoryUpdateRequestAPIView.as_view(), name='inventory_requests'),
     path(f'{base_url}/inventory/requests/<int:request_id>/', InventoryUpdateRequestAPIView.as_view(), name='inventory_request_detail'),
+    path(f'{base_url}/inventory/requests/<int:request_id>/action/<str:action>/', InventoryRequestActionAPIView.as_view(), name='inventory_request_action'),
+
 
     # User Authentication 
     path(f'{base_url}/auth/register/', authentication_views.RegisterView.as_view(), name='register'),
