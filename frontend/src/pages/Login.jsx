@@ -25,7 +25,7 @@ function Login() {
       setLoginError(loginResponse); // Set the error message
     }
   };
-  
+
   return (
     <section className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center">
       <div className="w-full max-w-md px-6 py-8 mx-auto">

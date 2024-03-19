@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import API from "../utilities/Axios";
 import { updateInventoryItem } from "../utilities/InventoryAPI";
+import { useAuth } from "../utilities/AuthProvider"
 
 const EditModal = ({ isOpen, onClose, item, onSave }) => {
+
+  const { tokens, role } = useAuth();
+  const accessToken = tokens?.access;
+
+  const buttonText = role === 'employee' ? "Request Changes" : "Save Changes";
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -48,9 +55,10 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting form with data:", formData);
-
+  
     try {
-      const updatedItem = await updateInventoryItem(item.id, formData);
+      console.log(tokens);
+      const updatedItem = await updateInventoryItem(item.id, formData, accessToken);
       console.log("Updated item:", updatedItem);
       onSave(updatedItem);
       onClose();
@@ -58,6 +66,7 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
       console.error("Error updating inventory item:", error);
     }
   };
+  
 
   if (!isOpen) return null;
 
@@ -196,7 +205,7 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
                       type="submit"
                       className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
-                      Save Changes
+                      {buttonText}
                     </button>
                   </div>
                 </form>

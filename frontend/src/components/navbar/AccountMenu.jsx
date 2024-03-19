@@ -6,10 +6,11 @@ import Transition from "../../utilities/Transition.jsx";
 export default function AccountMenu() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const { username, email, authProviderLogout } = useAuth();
+  const { username, email, authProviderLogout, role } = useAuth();
 
   const fullName = username || "Unknown User";
   const userEmail = email || "user@example.com";
+  const userRole = role || "Unkown Role";
   const dropdownRef = useRef(null);
 
   const handleLogout = async () => {
@@ -47,7 +48,7 @@ export default function AccountMenu() {
         </div>
         <div className="flex items-center truncate">
           <span className="truncate ml-2 text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-slate-400 dark:group-hover:text-white">
-            {fullName}
+            {fullName} <span className="uppercase decoration-auto text-xs font-normal"> ({role})</span>
           </span>
 
           <svg
@@ -72,7 +73,7 @@ export default function AccountMenu() {
       >
         <div className="py-1 bg-white shadow min-w-max dark:bg-gray-700 z-10">
           <div className="block px-4 py-2 text-sm text-gray-900 dark:text-white">
-            <div className="font-bold break-all">{fullName}</div>
+            <div className="font-bold break-all">{fullName} <span className="uppercase decoration-auto text-xs font-normal"> ({role})</span></div>
             <div className="text-gray-500 break-all">{userEmail}</div>
           </div>
           <hr className="border-gray-200 dark:border-gray-600" />

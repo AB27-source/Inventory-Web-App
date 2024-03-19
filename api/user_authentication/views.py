@@ -18,6 +18,7 @@ from django.contrib.sites.shortcuts import get_current_site
 import os
 from django.http import HttpResponsePermanentRedirect
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 
 class CustomRedirect(HttpResponsePermanentRedirect):
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
@@ -96,6 +97,8 @@ class VerifyEmail(views.APIView):
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -104,7 +107,8 @@ class LoginAPIView(generics.GenericAPIView):
             'tokens': user.tokens(),
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'email': user.email
+            'email': user.email,
+            'role': user.role
         }, status=status.HTTP_200_OK)
 
 class RequestPasswordResetEmail(generics.GenericAPIView):
