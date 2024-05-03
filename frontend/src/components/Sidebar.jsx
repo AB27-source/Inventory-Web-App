@@ -12,10 +12,29 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const trigger = useRef(null);
   const sidebar = useRef(null);
 
+  const [categories, setCategories] = useState([]);
+
   const storedSidebarExpanded = localStorage.getItem("sidebar-expanded");
   const [sidebarExpanded, setSidebarExpanded] = useState(
     storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
+
+  // Fetch categories from the backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/api/v1/inventory/categories/"
+        );
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("There was a problem with the fetch operation:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // close on click outside
   useEffect(() => {
@@ -92,7 +111,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           {/* Logo */}
           <NavLink end to="/" className="block">
             <img
-              src={sidebarExpanded ? UBLogoDark : UB} // Use the sidebarExpanded state here
+              src={sidebarExpanded ? UBLogoDark : UB}
               className="h-8"
               alt="UB Logo"
             />
@@ -165,111 +184,90 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
 
               {/* Tasks */}
-              <SidebarLinkGroup activecondition={pathname.includes("tasks")}>
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      <a
-                        href="#0"
-                        className={`block text-slate-200 truncate transition duration-150 ${
-                          pathname.includes("tasks")
-                            ? "hover:text-slate-200"
-                            : "hover:text-white"
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          sidebarExpanded
-                            ? handleClick()
-                            : setSidebarExpanded(true);
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
+              {/* Categories */}
+              <SidebarLinkGroup
+                activecondition={pathname.includes("/category/")}
+              >
+                {(handleClick, open) => (
+                  <>
+                    <a
+                      href="#0"
+                      className={`block text-slate-200 truncate transition duration-150 ${
+                        pathname.includes("/category/")
+                          ? "hover:text-slate-200"
+                          : "hover:text-white"
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        sidebarExpanded
+                          ? handleClick()
+                          : setSidebarExpanded(true);
+                      }}
+                    >
+                      {/* Category Icon and Title */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          {/* Category icon */}
+                          <svg className="shrink-0 h-6 w-6" viewBox="0 0 24 24">
                             <svg
-                              className="shrink-0 h-6 w-6"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
                               viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="w-6 h-6"
                             >
                               <path
-                                className={`fill-current ${
-                                  pathname.includes("tasks")
-                                    ? "text-indigo-500"
-                                    : "text-slate-600"
-                                }`}
-                                d="M8 1v2H3v19h18V3h-5V1h7v23H1V1z"
-                              />
-                              <path
-                                className={`fill-current ${
-                                  pathname.includes("tasks")
-                                    ? "text-indigo-500"
-                                    : "text-slate-600"
-                                }`}
-                                d="M1 1h22v23H1z"
-                              />
-                              <path
-                                className={`fill-current ${
-                                  pathname.includes("tasks")
-                                    ? "text-indigo-300"
-                                    : "text-slate-400"
-                                }`}
-                                d="M15 10.586L16.414 12 11 17.414 7.586 14 9 12.586l2 2zM5 0h14v4H5z"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
                               />
                             </svg>
-                            <span className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Tasks
-                            </span>
-                          </div>
-                          {/* Icon */}
-                          <div className="flex shrink-0 ml-2">
-                            <svg
-                              className={`w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 ${
-                                open && "rotate-180"
-                              }`}
-                              viewBox="0 0 12 12"
-                            >
-                              <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
-                            </svg>
-                          </div>
+
+                            {/* SVG Path */}
+                          </svg>
+                          <span className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                            Categories
+                          </span>
                         </div>
-                      </a>
-                      <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
-                        <ul className={`pl-9 mt-1 ${!open && "hidden"}`}>
-                          <li className="mb-1 last:mb-0">
-                            <NavLink
-                              end
-                              to="/tasks/kanban"
-                              className={({ isActive }) =>
-                                "block transition duration-150 truncate " +
-                                (isActive
-                                  ? "text-indigo-500"
-                                  : "text-slate-400 hover:text-slate-200")
-                              }
-                            >
-                              <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                                Kanban
-                              </span>
-                            </NavLink>
-                          </li>
-                          <li className="mb-1 last:mb-0">
-                            <NavLink
-                              end
-                              to="/tasks/list"
-                              className={({ isActive }) =>
-                                "block transition duration-150 truncate " +
-                                (isActive
-                                  ? "text-indigo-500"
-                                  : "text-slate-400 hover:text-slate-200")
-                              }
-                            >
-                              <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                                List
-                              </span>
-                            </NavLink>
-                          </li>
-                        </ul>
+                        {/* Arrow icon */}
+                        <div className="flex shrink-0 ml-2">
+                          <svg
+                            className={`w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 ${
+                              open && "rotate-180"
+                            }`}
+                            viewBox="0 0 12 12"
+                          >
+                            <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
+                          </svg>
+                        </div>
                       </div>
-                    </React.Fragment>
-                  );
-                }}
+                    </a>
+                    <div className="lg:hidden lg:sidebar-expanded:block 2xl:block">
+                      <ul className={`pl-9 mt-1 ${!open && "hidden"}`}>
+                      <span className="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                        {/* Render categories dynamically */}
+                        {categories.map((category) => (
+                          <li key={category.id} className="mb-1 last:mb-0">
+                            <NavLink
+                              to={`/inventory-management/${category.name}`}
+                              className={({ isActive }) =>
+                                `block text-slate-200 truncate transition duration-150 ${
+                                  isActive
+                                    ? "text-indigo-500"
+                                    : "text-slate-400 hover:text-slate-200"
+                                }`
+                              }
+                            >
+                              {category.name}
+                            </NavLink>
+                          </li>
+                        ))}
+                        </span>
+                      </ul>
+                    </div>
+                  </>
+                )}
               </SidebarLinkGroup>
               {/* Messages */}
               <li

@@ -17,7 +17,8 @@ class InventoryItemAPIView(views.APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, item_id=None):
+    def get(self, request, item_id=None, category_name=None):
+        # Case when an item_id is provided for detail view
         if item_id:
             try:
                 item = InventoryItem.objects.get(id=item_id)
@@ -25,19 +26,18 @@ class InventoryItemAPIView(views.APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except InventoryItem.DoesNotExist:
                 return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            # Get the category name from query parameters
-            category_name = request.query_params.get('category', None)
-            if category_name:
-                # Filter by category name
-                category = get_object_or_404(Category, name=category_name)
-                items = InventoryItem.objects.filter(category=category)
-            else:
-                items = InventoryItem.objects.all()
-
+        # Case when category_name is provided for filtering
+        elif category_name:
+            category = get_object_or_404(Category, name=category_name)
+            items = InventoryItem.objects.filter(category=category)
             serializer = self.serializer_class(items, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-    
+        # Default case, list all items
+        else:
+            items = InventoryItem.objects.all()
+            serializer = self.serializer_class(items, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
     User = get_user_model()
     
     def put(self, request, item_id):

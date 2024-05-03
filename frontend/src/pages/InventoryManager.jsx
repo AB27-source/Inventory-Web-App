@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../utilities/AuthProvider";
 import MainLayout from "../components/MainLayout";
@@ -61,23 +61,60 @@ const InventoryManagement = () => {
     }
   };
 
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "ascending",
+  });
+
+  const sortedItems = useMemo(() => {
+    let sortableItems = [...inventoryItems]; // Create a copy of the inventory items
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [inventoryItems, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
+
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
+      const categoryURL = `inventory/items/category/${encodeURIComponent(
+        category
+      )}/`;
+
+      console.log("Fetching items from:", categoryURL); // Log the URL being used
       try {
-        const response = await API.get(`/inventory/items/`, {
-          params: { category: category },
-        });
+        const response = await API.get(categoryURL);
+        console.log("API Response:", response.data); // Log the data received from the API
         setInventoryItems(response.data);
       } catch (error) {
-        console.error("Error fetching inventory items:", error);
+        console.error(
+          "Error fetching inventory items from category:",
+          category,
+          error
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchItems();
-  }, [category]);
+  }, [category]); // Depend on category to refetch when it changes
 
   // if (loading) {
   //   return <SkeletonLoader />;
@@ -100,15 +137,32 @@ const InventoryManagement = () => {
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  {/* Column headers */}
-                  <th scope="col" className="px-6 py-3">
-                    Item Name
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => requestSort("name")}
+                  >
+                    <div className="flex items-center justify-between">
+                      Item Name <FaSort />
+                    </div>
                   </th>
-                  <th scope="col" className="px-6 py-3">
-                    Quantity
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => requestSort("quantity")}
+                  >
+                    <div className="flex items-center justify-between">
+                      Quantity <FaSort />
+                    </div>
                   </th>
-                  <th scope="col" className="px-6 py-3">
-                    Price
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => requestSort("price")}
+                  >
+                    <div className="flex items-center justify-between">
+                      Price <FaSort />
+                    </div>
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Category
@@ -118,8 +172,9 @@ const InventoryManagement = () => {
                   </th>
                 </tr>
               </thead>
+
               <tbody>
-                {inventoryItems.map((item) => (
+                {sortedItems.map((item) => (
                   <tr
                     key={item.id}
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
