@@ -167,7 +167,7 @@ const InventoryManagement = () => {
                   <th scope="col" className="px-6 py-3">
                     Category
                   </th>
-                  <th scope="col" className="px-6 py-3">
+                  <th scope="col" className="px-6 py-3 text-center">
                     Actions
                   </th>
                 </tr>
@@ -183,25 +183,23 @@ const InventoryManagement = () => {
                     <td className="px-6 py-4">{item.quantity}</td>
                     <td className="px-6 py-4">${item.price}</td>
                     <td className="px-6 py-4">{item.category}</td>
-                    <td
-                      className={`px-6 py-4 ${
-                        role !== "employee" ? "flex justify-between" : ""
-                      }`}
-                    >
-                      <button
-                        onClick={() => openEditModal(item)}
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-auto"
-                      >
-                        Edit
-                      </button>
-                      {role !== "employee" && (
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex justify-center gap-4">
                         <button
-                          onClick={() => openConfirmModal(item.id)}
-                          className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                          onClick={() => openEditModal(item)}
+                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                         >
-                          Delete
+                          Edit
                         </button>
-                      )}
+                        {role !== "employee" && (
+                          <button
+                            onClick={() => openConfirmModal(item.id)}
+                            className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
