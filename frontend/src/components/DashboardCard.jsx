@@ -7,9 +7,11 @@ function DashboardCard({ category, items, onClick }) {
     direction: "ascending",
   });
 
+  const maxVisibleItems = 4
+
   const sortedItems = React.useMemo(() => {
     let sortableItems = [...items];
-    if (sortConfig !== null) {
+    if (sortConfig.key !== null) {
       sortableItems.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === "ascending" ? -1 : 1;
@@ -42,44 +44,33 @@ function DashboardCard({ category, items, onClick }) {
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
         <h2
           className="font-semibold text-slate-800 dark:text-slate-100 cursor-pointer"
-          onClick={handleCategoryHeaderClick} // Attach the click event handler here
+          onClick={handleCategoryHeaderClick}
         >
           {category}
         </h2>
       </header>
       <div className="p-3">
-        <div className="overflow-x-auto overflow-y-auto max-h-[250px] scrollbar-thin">
+        {/* Only apply 'overflow-y-auto' when there are too many items ✅ */}
+        <div className={`overflow-x-auto ${sortedItems.length > maxVisibleItems ? "overflow-y-auto max-h-[250px]" : ""} scrollbar-thin`}>
           <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
             <thead className="bg-slate-50 dark:bg-slate-700 sticky top-0 z-10">
               <tr>
-                <th
-                  className="px-6 py-3 w-1/4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("name")}
-                >
+                <th className="px-6 py-3 w-1/4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("name")}>
                   <div className="flex items-center justify-start">
                     Item Name <FaSort className="ml-2" />
                   </div>
                 </th>
-                <th
-                  className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("quantity")}
-                >
+                <th className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("quantity")}>
                   <div className="flex items-center justify-center">
                     Quantity <FaSort className="ml-2" />
                   </div>
                 </th>
-                <th
-                  className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("price")}
-                >
+                <th className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("price")}>
                   <div className="flex items-center justify-center">
                     Price <FaSort className="ml-2" />
                   </div>
                 </th>
-                <th
-                  className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => requestSort("last_updated")}
-                >
+                <th className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("last_updated")}>
                   <div className="flex items-center justify-center">
                     Last Updated <FaSort className="ml-2" />
                   </div>
@@ -87,7 +78,6 @@ function DashboardCard({ category, items, onClick }) {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
-              {/* Table rows */}
               {sortedItems.map((item, index) => {
                 const date = new Date(item.last_updated);
                 const formattedDate = date.toLocaleDateString(undefined, {
