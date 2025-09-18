@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { FiChevronDown, FiSearch } from "react-icons/fi";
 import Transition from "../utilities/Transition";
 
-function SearchBar({ categories, onSearch }) {
+function SearchBar({ categories, onSearch, className = "" }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All categories");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,8 +14,8 @@ function SearchBar({ categories, onSearch }) {
     );
   }, [searchTerm, selectedCategory, onSearch]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  const handleSearch = (event) => {
+    event.preventDefault();
     setIsDropdownOpen(false);
   };
 
@@ -22,89 +23,69 @@ function SearchBar({ categories, onSearch }) {
     setSelectedCategory(category);
     setIsDropdownOpen(false);
   };
+
+  const normalizedCategories = Array.isArray(categories) ? categories : [];
+
   return (
-    <form onSubmit={handleSearch}>
-      <div className="flex relative mb-12">
-        <label
-          htmlFor="search-dropdown"
-          className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-        >
-          Category Dropdown
-        </label>
-        <button
-          id="dropdown-button"
-          data-dropdown-toggle="dropdown"
-          className="flex-shrink-0 position:fixed z-50 rounded-l-3xl inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600 overflow-hidden"
-          type="button"
-          style={{ width: "auto" }}
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
-          {selectedCategory}{" "}
-          <svg
-            className="w-2.5 h-2.5 ms-2.5"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 10 6"
+    <form onSubmit={handleSearch} className={className}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+        <div className="relative sm:w-60">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-emerald-400 hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-200 dark:hover:border-emerald-400/60"
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            aria-haspopup="listbox"
+            aria-expanded={isDropdownOpen}
           >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="m1 1 4 4 4-4"
+            <span className="truncate">{selectedCategory}</span>
+            <FiChevronDown
+              className={`h-4 w-4 transition-transform ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
             />
-          </svg>
-        </button>
-        <Transition
-          show={isDropdownOpen}
-          enter="transition-opacity ease-out duration-200"
-          enterStart="opacity-0"
-          enterEnd="opacity-100"
-          leave="transition-opacity ease-in duration-75"
-          leaveStart="opacity-100"
-          leaveEnd="opacity-0"
-        >
-          {/* Dropdown menu */}
-          <div
-            id="dropdown"
-            className="absolute mt-1 bg-white divide-y divide-gray-100 rounded-3xl shadow w-44 dark:bg-gray-700 overflow-hidden" // Increase z-index significantly to ensure it's on top
-            style={{ top: "100%", left: 0 }}
-            aria-labelledby="dropdown-button"
+          </button>
+          <Transition
+            show={isDropdownOpen}
+            enter="transition-opacity ease-out duration-150"
+            enterStart="opacity-0"
+            enterEnd="opacity-100"
+            leave="transition-opacity ease-in duration-100"
+            leaveStart="opacity-100"
+            leaveEnd="opacity-0"
           >
-            {/* Dropdown items */}
-            <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-              {categories.map((category, idx) => (
-                <li
-                  key={idx}
-                  className={`${
-                    idx === 0
-                      ? "rounded-t-3xl"
-                      : idx === categories.length - 1
-                      ? "rounded-b-3xl"
-                      : ""
-                  }`}
-                >
-                  <button
-                    type="button"
-                    className="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    onClick={() => handleCategorySelect(category)}
-                  >
-                    {category}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Transition>
-        <div className="relative w-full">
+            <div
+              className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800"
+              role="listbox"
+            >
+              <ul className="max-h-60 overflow-y-auto py-1 text-sm text-slate-700 dark:text-slate-200">
+                {normalizedCategories.map((category) => (
+                  <li key={category}>
+                    <button
+                      type="button"
+                      className={`flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-emerald-50 dark:hover:bg-slate-700 ${
+                        category === selectedCategory
+                          ? "bg-emerald-50/80 font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300"
+                          : ""
+                      }`}
+                      onClick={() => handleCategorySelect(category)}
+                    >
+                      <span className="truncate">{category}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Transition>
+        </div>
+        <div className="relative flex-1">
+          <FiSearch className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="search"
             id="search-dropdown"
-            className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-3xl border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white h-full"
-            placeholder="Search for Inventory Items"
-            required
+            className="w-full rounded-2xl border border-slate-200/80 bg-white/90 py-2.5 pl-11 pr-4 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 dark:border-slate-700 dark:bg-slate-800/90 dark:text-white"
+            placeholder="Search by item name or keyword"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
         </div>
       </div>
