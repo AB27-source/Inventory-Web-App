@@ -14,6 +14,9 @@ class InventoryItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     last_updated = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    recommended_quantity = models.PositiveIntegerField(default=0)
+    warning_quantity = models.PositiveIntegerField(default=0)
     
     def update_quantity(self, new_quantity, approved_by=None):
         if approved_by:

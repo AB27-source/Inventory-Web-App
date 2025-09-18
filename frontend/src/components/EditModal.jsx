@@ -1,30 +1,34 @@
 import React, { useState, useEffect } from "react";
 import API from "../utilities/Axios";
 import { updateInventoryItem } from "../utilities/InventoryAPI";
-import { useAuth } from "../utilities/AuthProvider"
+import { useAuth } from "../utilities/AuthProvider";
 
 const EditModal = ({ isOpen, onClose, item, onSave }) => {
-
   const { tokens, role } = useAuth();
   const accessToken = tokens?.access;
+  const isEmployee = role === "employee";
 
-  const buttonText = role === 'employee' ? "Request Changes" : "Save Changes";
+  const buttonText = isEmployee ? "Request Changes" : "Save Changes";
 
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     category: "",
     quantity: 1,
+    recommended_quantity: 0,
+    warning_quantity: 0,
   });
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     if (item && isOpen) {
       setFormData({
-        name: item.name || "",
-        price: item.price || "",
-        category: item.category || "",
-        quantity: item.quantity || 1,
+        name: item.name ?? "",
+        price: item.price ?? "",
+        category: item.category ?? "",
+        quantity: Number(item.quantity ?? 1),
+        recommended_quantity: Number(item.recommended_quantity ?? 0),
+        warning_quantity: Number(item.warning_quantity ?? 0),
       });
     }
   }, [item, isOpen]);
@@ -46,19 +50,64 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setFormData((prevState) => {
+      if (name === "quantity") {
+        const numericValue = Number(value);
+        return {
+          ...prevState,
+          quantity: Number.isNaN(numericValue) ? 0 : numericValue,
+        };
+      }
+
+      if (name === "recommended_quantity") {
+        const numericValue = Number(value);
+        const sanitizedValue = Number.isNaN(numericValue) ? 0 : numericValue;
+        const warningValue = prevState.warning_quantity;
+        const adjustedWarning =
+          typeof warningValue === "number" && warningValue > sanitizedValue
+            ? sanitizedValue
+            : warningValue;
+
+        return {
+          ...prevState,
+          recommended_quantity: sanitizedValue,
+          warning_quantity: adjustedWarning,
+        };
+      }
+
+      if (name === "warning_quantity") {
+        const numericValue = Number(value);
+        const sanitizedValue = Number.isNaN(numericValue) ? 0 : numericValue;
+        const recommendedValue = prevState.recommended_quantity;
+        const clampedValue =
+          typeof recommendedValue === "number"
+            ? Math.min(sanitizedValue, recommendedValue)
+            : sanitizedValue;
+
+        return {
+          ...prevState,
+          warning_quantity: clampedValue,
+        };
+      }
+
+      return {
+        ...prevState,
+        [name]: value,
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting form with data:", formData);
-  
+
     try {
       console.log(tokens);
-      const updatedItem = await updateInventoryItem(item.id, formData, accessToken);
+      const updatedItem = await updateInventoryItem(
+        item.id,
+        formData,
+        accessToken
+      );
       console.log("Updated item:", updatedItem);
       onSave(updatedItem);
       onClose();
@@ -66,7 +115,6 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
       console.error("Error updating inventory item:", error);
     }
   };
-  
 
   if (!isOpen) return null;
 
@@ -151,6 +199,47 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
                       placeholder="Enter quantity"
                       required
                       min="0"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="recommended_quantity"
+                      className="block text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Recommended Quantity
+                    </label>
+                    <input
+                      type="number"
+                      name="recommended_quantity"
+                      id="recommended_quantity"
+                      value={formData.recommended_quantity}
+                      onChange={handleChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                      placeholder="Enter recommended quantity"
+                      min="0"
+                      required
+                      disabled={isEmployee}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="warning_quantity"
+                      className="block text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Warning Quantity
+                    </label>
+                    <input
+                      type="number"
+                      name="warning_quantity"
+                      id="warning_quantity"
+                      value={formData.warning_quantity}
+                      onChange={handleChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                      placeholder="Enter warning quantity"
+                      min="0"
+                      max={formData.recommended_quantity}
+                      required
+                      disabled={isEmployee}
                     />
                   </div>
                   <div>

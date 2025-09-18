@@ -7,7 +7,7 @@ function DashboardCard({ category, items, onClick }) {
     direction: "ascending",
   });
 
-  const maxVisibleItems = 4
+  const maxVisibleItems = 4;
 
   const sortedItems = React.useMemo(() => {
     let sortableItems = [...items];
@@ -39,6 +39,36 @@ function DashboardCard({ category, items, onClick }) {
     }
   };
 
+  const getRowClassName = (item, index) => {
+    const quantityValue = Number(item.quantity);
+    const warningValue = Number(item.warning_quantity);
+    const recommendedValue = Number(item.recommended_quantity);
+
+    const defaultRow = `${
+      index % 2 === 0
+        ? "bg-slate-50 dark:bg-slate-800"
+        : "bg-white dark:bg-slate-700"
+    } hover:bg-slate-100 dark:hover:bg-slate-600`;
+
+    const isBelowWarning =
+      !Number.isNaN(warningValue) &&
+      warningValue > 0 &&
+      quantityValue <= warningValue;
+    if (isBelowWarning) {
+      return "bg-red-100 hover:bg-red-200 dark:bg-red-900/60 dark:hover:bg-red-900/80";
+    }
+
+    const isBelowRecommended =
+      !Number.isNaN(recommendedValue) &&
+      recommendedValue > 0 &&
+      quantityValue <= recommendedValue;
+    if (isBelowRecommended) {
+      return "bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/60 dark:hover:bg-yellow-900/80";
+    }
+
+    return defaultRow;
+  };
+
   return (
     <div className="col-span-full xl:col-span-8 bg-white dark:bg-slate-800 shadow-lg rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden">
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
@@ -51,26 +81,44 @@ function DashboardCard({ category, items, onClick }) {
       </header>
       <div className="p-3">
         {/* Only apply 'overflow-y-auto' when there are too many items ✅ */}
-        <div className={`overflow-x-auto ${sortedItems.length > maxVisibleItems ? "overflow-y-auto max-h-[250px]" : ""} scrollbar-thin`}>
+        <div
+          className={`overflow-x-auto ${
+            sortedItems.length > maxVisibleItems
+              ? "overflow-y-auto max-h-[250px]"
+              : ""
+          } scrollbar-thin`}
+        >
           <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
             <thead className="bg-slate-50 dark:bg-slate-700 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-3 w-1/4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("name")}>
+                <th
+                  className="px-6 py-3 w-1/4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => requestSort("name")}
+                >
                   <div className="flex items-center justify-start">
                     Item Name <FaSort className="ml-2" />
                   </div>
                 </th>
-                <th className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("quantity")}>
+                <th
+                  className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => requestSort("quantity")}
+                >
                   <div className="flex items-center justify-center">
                     Quantity <FaSort className="ml-2" />
                   </div>
                 </th>
-                <th className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("price")}>
+                <th
+                  className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => requestSort("price")}
+                >
                   <div className="flex items-center justify-center">
                     Price <FaSort className="ml-2" />
                   </div>
                 </th>
-                <th className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer" onClick={() => requestSort("last_updated")}>
+                <th
+                  className="px-6 py-3 w-1/4 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer"
+                  onClick={() => requestSort("last_updated")}
+                >
                   <div className="flex items-center justify-center">
                     Last Updated <FaSort className="ml-2" />
                   </div>
@@ -91,11 +139,7 @@ function DashboardCard({ category, items, onClick }) {
                 return (
                   <tr
                     key={item.id}
-                    className={`${
-                      index % 2 === 0
-                        ? "bg-slate-50 dark:bg-slate-800"
-                        : "bg-white dark:bg-slate-700"
-                    } hover:bg-slate-100 dark:hover:bg-slate-600`}
+                    className={getRowClassName(item, index)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">
                       {item.name}

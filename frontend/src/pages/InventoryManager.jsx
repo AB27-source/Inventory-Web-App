@@ -90,6 +90,38 @@ const InventoryManagement = () => {
     setSortConfig({ key, direction });
   };
 
+  const getRowClassName = (item, index) => {
+    const quantityValue = Number(item.quantity);
+    const warningValue = Number(item.warning_quantity);
+    const recommendedValue = Number(item.recommended_quantity);
+
+    const defaultRow = `${
+      index % 2 === 0
+        ? "bg-white dark:bg-gray-800"
+        : "bg-gray-50 dark:bg-gray-700"
+    } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600`;
+
+    const isBelowWarning =
+      !Number.isNaN(warningValue) &&
+      warningValue > 0 &&
+      quantityValue <= warningValue;
+
+    if (isBelowWarning) {
+      return "border-b border-red-200 bg-red-100 hover:bg-red-200 dark:border-red-700 dark:bg-red-900/60 dark:hover:bg-red-900/80";
+    }
+
+    const isBelowRecommended =
+      !Number.isNaN(recommendedValue) &&
+      recommendedValue > 0 &&
+      quantityValue <= recommendedValue;
+
+    if (isBelowRecommended) {
+      return "border-b border-yellow-200 bg-yellow-100 hover:bg-yellow-200 dark:border-yellow-700 dark:bg-yellow-900/60 dark:hover:bg-yellow-900/80";
+    }
+
+    return defaultRow;
+  };
+
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
@@ -180,11 +212,8 @@ const InventoryManagement = () => {
                 </thead>
 
                 <tbody>
-                  {sortedItems.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    >
+                  {sortedItems.map((item, index) => (
+                    <tr key={item.id} className={getRowClassName(item, index)}>
                       <td className="px-6 py-4">{item.name}</td>
                       <td className="px-6 py-4">{item.quantity}</td>
                       <td className="px-6 py-4">${item.price}</td>

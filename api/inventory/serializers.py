@@ -15,6 +15,8 @@ class InventoryItemSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
     quantity = serializers.IntegerField(required=True)
     price = serializers.DecimalField(required=True, max_digits=10, decimal_places=2)
+    recommended_quantity = serializers.IntegerField(required=False, min_value=0, default=0)
+    warning_quantity = serializers.IntegerField(required=False, min_value=0, default=0) 
 
     class Meta:
         model = InventoryItem
@@ -25,15 +27,36 @@ class InventoryItemSerializer(serializers.ModelSerializer):
             "price",
             "category",
             "last_updated",
+            "recommended_quantity",
+            "warning_quantity",
         )
 
     # def get_category(self, obj):
     #     return obj.category.name
 
     def validate(self, data):
-        if data['quantity'] < 0:
+        quantity = data.get('quantity', getattr(self.instance, 'quantity', 0))
+        recommended = data.get('recommended_quantity', getattr(self.instance, 'recommended_quantity', 0))
+        warning = data.get('warning_quantity', getattr(self.instance, 'warning_quantity', 0))
+
+        if quantity < 0:
             raise serializers.ValidationError(
                 {"quantity": "Quantity cannot be negative."}
+            )
+
+        if recommended < 0:
+            raise serializers.ValidationError(
+                {"recommended_quantity": "Recommended quantity cannot be negative."}
+            )
+
+        if warning < 0:
+            raise serializers.ValidationError(
+                {"warning_quantity": "Warning quantity cannot be negative."}
+            )
+
+        if warning > recommended:
+            raise serializers.ValidationError(
+                {"warning_quantity": "Warning quantity cannot exceed the recommended quantity."}
             )
 
         return data
