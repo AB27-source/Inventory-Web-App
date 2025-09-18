@@ -35,10 +35,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMPLOYEE = 'employee'
     MANAGER = 'manager'
     ADMIN = 'admin'
+    FRONTDESK = 'front desk'
+    HOUSEKEEPING = 'housekeeping'
+    MAINTENANCE = 'maintenance'
+
     ROLE_CHOICES = [
         (EMPLOYEE, 'Employee'),
         (MANAGER, 'Manager'),
         (ADMIN, 'Admin'),
+        (FRONTDESK, 'Front Desk'),
+        (HOUSEKEEPING, 'Housekeeping'),
+        (MAINTENANCE, 'Maintenance'),
     ]
     first_name = models.CharField(max_length=150, default='')
     last_name = models.CharField(max_length=150, default='')
@@ -46,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=EMPLOYEE)
+    role = models.CharField(max_length=12, choices=ROLE_CHOICES, default=EMPLOYEE)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
