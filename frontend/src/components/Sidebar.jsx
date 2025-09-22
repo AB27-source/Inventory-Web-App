@@ -111,8 +111,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   // --- styles ----------------------------------------------------------------
   const baseItemClasses =
-    "group relative flex items-center rounded-lg transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70";
-
+    "group relative flex w-full items-center rounded-lg transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70";
   const navLinkClassName = (isActive) =>
     [
       baseItemClasses,
@@ -156,13 +155,18 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
       <aside
         id="sidebar"
         ref={sidebar}
-        className={`flex flex-col fixed z-50 inset-y-0 left-0 transform border-r border-slate-200/80 dark:border-slate-800/70 bg-white/90 dark:bg-slate-950/80 backdrop-blur-md shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
-          sidebarExpanded ? "w-72" : "w-24" 
+        className={`flex flex-col h-screen fixed inset-y-0 left-0 z-50 flex-shrink-0 overflow-hidden transform border-r border-slate-200/80 bg-white/90 shadow-xl transition-transform duration-300 ease-in-out dark:border-slate-800/70 dark:bg-slate-950/80 backdrop-blur-md lg:static lg:translate-x-0 ${
+          sidebarExpanded ? "w-72" : "w-20 min-w-[5rem] max-w-[5rem]"
         } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="flex flex-col flex-1 overflow-y-auto no-scrollbar px-3 py-5">
+        <div className="flex flex-col flex-1 px-3 py-5">
           {/* Header */}
-          <div className="flex items-center justify-between px-1">
+          <div
+            className={`flex items-center ${
+              sidebarExpanded ? "justify-between px-1" : "justify-center px-0"
+            }`}
+          >
+            {" "}
             <button
               ref={trigger}
               className="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-200/70 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/70 lg:hidden"
@@ -182,8 +186,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 />
               </svg>
             </button>
-
-            <NavLink end to="/" className="flex items-center justify-center">
+            <NavLink
+              end
+              to="/"
+              className="flex w-full items-center justify-center"
+            >
+              {" "}
               {sidebarExpanded ? (
                 <>
                   {/* Show light or dark logo based on theme */}
@@ -199,16 +207,24 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   />
                 </>
               ) : (
-                <img src={UB} className="h-9 w-auto justify-center" alt="UB Collapsed Logo" />
+                <img
+                  src={UB}
+                  className="h-9 w-auto mx-auto"
+                  alt="UB Collapsed Logo"
+                />
               )}
             </NavLink>
-
             {/* spacer to balance logo when expanded */}
             <div className={`${sidebarExpanded ? "w-10" : "w-0"}`} />
           </div>
 
           {/* Navigation */}
-          <nav className="mt-6 flex-1 space-y-8">
+          <nav
+            className={`mt-6 flex-1 space-y-8 ${
+              sidebarExpanded ? "" : "flex w-full flex-col items-center"
+            }`}
+          >
+            {" "}
             {/* Overview */}
             <div>
               <p
@@ -258,7 +274,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 })}
               </ul>
             </div>
-
             {/* Inventory */}
             <div>
               <p
@@ -357,19 +372,31 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
           {/* Footer / Collapse button */}
           <div className="mt-auto pt-5">
-            <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3 text-center text-xs text-slate-500 shadow-sm dark:border-slate-800/70 dark:bg-slate-900/60 dark:text-slate-400">
-              <p className="font-medium text-slate-600 dark:text-slate-200">
-                Need a new view?
-              </p>
-              <p className="mt-1 text-[11px]">
-                Customize categories and navigation from the settings panel.
-              </p>
-            </div>
+            {sidebarExpanded ? (
+              <div className="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3 text-center text-xs text-slate-500 shadow-sm dark:border-slate-800/70 dark:bg-slate-900/60 dark:text-slate-400">
+                <p className="font-medium text-slate-600 dark:text-slate-200">
+                  Need a new view?
+                </p>
+                <p className="mt-1 text-[11px]">
+                  Customize categories and navigation from the settings panel.
+                </p>
+              </div>
+            ) : (
+              // vertical ellipsis for collapsed state
+              <div
+                className="mx-auto my-2 flex flex-col items-center gap-1 opacity-55"
+                aria-hidden="true"
+              >
+                <span className="block h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+                <span className="block h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+                <span className="block h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+              </div>
+            )}
 
             <button
               type="button"
               onClick={handleSidebarExpandToggle}
-              className={`mt-4 ${
+              className={`relative mt-4 ${
                 sidebarExpanded
                   ? "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
                   : "mx-auto flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
@@ -389,8 +416,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 }`}
                 aria-hidden="true"
               />
-
-              {/* tooltip for collapsed */}
               {!sidebarExpanded && (
                 <span className="pointer-events-none absolute left-full bottom-6 ml-2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs text-white opacity-0 shadow-md transition hover:opacity-100">
                   Expand sidebar
