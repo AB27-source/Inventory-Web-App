@@ -145,7 +145,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     <div>
       {/* Sidebar backdrop (mobile only) */}
       <div
-        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-200 ${
+        className={`fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-500 ease-out lg:hidden ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         aria-hidden="true"
@@ -155,9 +155,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
       <aside
         id="sidebar"
         ref={sidebar}
-        className={`flex flex-col h-screen fixed inset-y-0 left-0 z-50 flex-shrink-0 overflow-hidden transform border-r border-slate-200/80 bg-white/90 shadow-xl transition-transform duration-300 ease-in-out dark:border-slate-800/70 dark:bg-slate-950/80 backdrop-blur-md lg:static lg:translate-x-0 ${
+        className={`flex flex-col h-screen fixed inset-y-0 left-0 z-50 flex-shrink-0 overflow-hidden border-r border-slate-200/80 bg-white/90 shadow-xl transition-[transform,opacity,width,min-width,max-width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform dark:border-slate-800/70 dark:bg-slate-950/80 backdrop-blur-md lg:static lg:translate-x-0 lg:opacity-100 lg:pointer-events-auto ${
           sidebarExpanded ? "w-72" : "w-20 min-w-[5rem] max-w-[5rem]"
-        } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        } } ${
+          sidebarOpen
+            ? "translate-x-0 opacity-100 pointer-events-auto"
+            : "-translate-x-full opacity-0 pointer-events-none lg:translate-x-0 lg:opacity-100"
+        }`}
       >
         <div className="flex flex-col flex-1 px-3 py-5">
           {/* Header */}
@@ -215,7 +219,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               )}
             </NavLink>
             {/* spacer to balance logo when expanded */}
-            <div className={`${sidebarExpanded ? "w-10" : "w-0"}`} />
+            <div
+              className={`transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                sidebarExpanded ? "w-10" : "w-0"
+              }`}
+            />{" "}
           </div>
 
           {/* Navigation */}
