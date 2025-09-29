@@ -558,41 +558,43 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 )}
               </AnimatePresence>
 
-              <motion.button
-                type="button"
-                onClick={handleSidebarExpandToggle}
-                className={`relative mt-4 ${
-                  collapsed
-                    ? "mx-auto flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
-                    : "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
-                }`}
-                aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                whileTap={{ scale: 0.98 }}
-              >
-                <AnimatePresence initial={false}>
-                  {!collapsed && (
-                    <motion.span
-                      key="collapse-label"
-                      initial={{ opacity: 0, x: -6 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -6 }}
-                    >
-                      Collapse sidebar
-                    </motion.span>
+              {isDesktop && (
+                <motion.button
+                  type="button"
+                  onClick={handleSidebarExpandToggle}
+                  className={`relative mt-4 ${
+                    collapsed
+                      ? "mx-auto flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
+                      : "flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
+                  }`}
+                  aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <AnimatePresence initial={false}>
+                    {!collapsed && (
+                      <motion.span
+                        key="collapse-label"
+                        initial={{ opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -6 }}
+                      >
+                        Collapse sidebar
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  <motion.span animate={{ rotate: collapsed ? 180 : 0 }}>
+                    <ChevronDoubleLeftIcon
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  </motion.span>
+                  {collapsed && (
+                    <span className="pointer-events-none absolute left-full bottom-6 ml-2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs text-white opacity-0 shadow-md transition group-hover:opacity-100">
+                      Expand sidebar
+                    </span>
                   )}
-                </AnimatePresence>
-                <motion.span animate={{ rotate: collapsed ? 180 : 0 }}>
-                  <ChevronDoubleLeftIcon
-                    className="h-4 w-4"
-                    aria-hidden="true"
-                  />
-                </motion.span>
-                {collapsed && (
-                  <span className="pointer-events-none absolute left-full bottom-6 ml-2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs text-white opacity-0 shadow-md transition group-hover:opacity-100">
-                    Expand sidebar
-                  </span>
-                )}
-              </motion.button>
+                </motion.button>
+              )}
             </div>
           </div>
         </motion.aside>

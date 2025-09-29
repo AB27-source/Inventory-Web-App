@@ -394,7 +394,7 @@ function Dashboard() {
   return (
     <MainLayout>
       <div className="min-h-full bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pt-6 pb-12 sm:px-6 sm:pt-8 lg:px-8">
           <section className="grid gap-6 lg:grid-cols-[2fr,1.05fr]">
             <div className="relative rounded-4xl border border-white/60 bg-white/85 p-8 shadow-xl shadow-emerald-100/40 backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/70 dark:shadow-emerald-900/20">
               <div className="pointer-events-none absolute -left-24 -top-28 h-56 w-56 rounded-full bg-emerald-200/40 blur-3xl dark:bg-emerald-500/10" />

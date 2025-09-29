@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import API from "../utilities/Axios";
 import { updateInventoryItem } from "../utilities/InventoryAPI";
 import { useAuth } from "../utilities/AuthProvider";
 
-const EditModal = ({ isOpen, onClose, item, onSave }) => {
+const EditModal = ({ isOpen, onClose, item, onSave, onError }) => {
   const { tokens, role } = useAuth();
   const accessToken = tokens?.access;
   const isEmployee = role === "employee";
@@ -19,6 +20,7 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
     warning_quantity: 0,
   });
   const [categories, setCategories] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (item && isOpen) {
@@ -102,6 +104,7 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
     console.log("Submitting form with data:", formData);
 
     try {
+      setIsSubmitting(true);
       console.log(tokens);
       const updatedItem = await updateInventoryItem(
         item.id,
@@ -113,197 +116,262 @@ const EditModal = ({ isOpen, onClose, item, onSave }) => {
       onClose();
     } catch (error) {
       console.error("Error updating inventory item:", error);
+      if (onError) {
+        onError(error);
+      }
+      onClose();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className={`fixed inset-0 z-50 overflow-y-auto ${isOpen ? "" : "hidden"}`}
-      aria-labelledby="modal-title"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="flex items-center justify-center min-h-screen">
-        <div
-          className="fixed inset-0 bg-slate-950 bg-opacity-75 transition-opacity"
-          aria-hidden="true"
-        ></div>
-        {/* modal container */}
-        <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-          <div className="bg-white dark:bg-gray-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div className="sm:flex sm:items-start">
-              <div className="text-center sm:mt-0 sm:text-left w-full">
-                <div className="flex justify-between items-center pb-3">
-                  <h3
-                    className="text-lg leading-6 font-medium text-gray-900 dark:text-white"
-                    id="modal-title"
-                  >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="edit-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 flex min-h-dvh items-center justify-center p-4 sm:p-6"
+          aria-labelledby="edit-item-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <motion.button
+            type="button"
+            aria-hidden="true"
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+          />
+
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{
+              type: "spring",
+              stiffness: 280,
+              damping: 28,
+              mass: 0.7,
+            }}
+            className="relative z-10 w-full max-w-xl"
+          >
+            <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 p-6 shadow-2xl shadow-slate-900/10 backdrop-blur dark:border-white/10 dark:bg-slate-900/80 dark:shadow-black/40 sm:p-8">
+              <motion.div
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08, duration: 0.3, ease: "easeOut" }}
+                className="absolute inset-x-0 -top-20 h-40 bg-gradient-to-b from-indigo-500/20 via-transparent to-transparent blur-3xl"
+                aria-hidden="true"
+              />
+
+              <div className="relative flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400 dark:text-slate-500">
                     Edit Product
-                  </h3>
-                  <button
-                    onClick={onClose}
-                    className="text-gray-400 dark:text-gray-200 hover:text-gray-500 dark:hover:text-white focus:outline-none"
+                  </p>
+                  <h2
+                    id="edit-item-title"
+                    className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white"
                   >
-                    {/* Close Icon */}
-                    <svg
-                      className="h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
+                    {formData.name || "Inventory Item"}
+                  </h2>
                 </div>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                      placeholder="Type product name"
-                      required
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200/80 bg-white/70 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/60 dark:border-white/10 dark:bg-white/10 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4.75 4.75L15.25 15.25M4.75 15.25L15.25 4.75"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
-                  </div>
-                  <div>
+                  </svg>
+                </button>
+              </div>
+
+              <motion.form
+                onSubmit={handleSubmit}
+                className="mt-6 space-y-5"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.04, duration: 0.3, ease: "easeOut" }}
+              >
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
                     <label
-                      htmlFor="quantity"
-                      className="block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Quantity
-                    </label>
-                    <input
-                      type="number"
-                      name="quantity"
-                      id="quantity"
-                      value={formData.quantity}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                      placeholder="Enter quantity"
-                      required
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="recommended_quantity"
-                      className="block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Recommended Quantity
-                    </label>
-                    <input
-                      type="number"
-                      name="recommended_quantity"
-                      id="recommended_quantity"
-                      value={formData.recommended_quantity}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                      placeholder="Enter recommended quantity"
-                      min="0"
-                      required
-                      disabled={isEmployee}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="warning_quantity"
-                      className="block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Warning Quantity
-                    </label>
-                    <input
-                      type="number"
-                      name="warning_quantity"
-                      id="warning_quantity"
-                      value={formData.warning_quantity}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                      placeholder="Enter warning quantity"
-                      min="0"
-                      max={formData.recommended_quantity}
-                      required
-                      disabled={isEmployee}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="price"
-                      className="block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Price
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      id="price"
-                      value={formData.price}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                      placeholder="Enter price"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Category
-                    </label>
-                    <select
-                      name="category"
-                      id="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                      required
-                    >
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex justify-end pt-4 space-x-2">
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
-                      onClick={onClose}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-                    >
-                      {buttonText}
-                    </button>
-                  </div>
-                </form>
+                  htmlFor="name"
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Type product name"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="quantity"
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name="quantity"
+                  id="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  min="0"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40"
+                  placeholder="Quantity"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="price"
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Price
+                </label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  name="price"
+                  id="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="recommended_quantity"
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Recommended Quantity
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name="recommended_quantity"
+                  id="recommended_quantity"
+                  value={formData.recommended_quantity}
+                  onChange={handleChange}
+                  min="0"
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40"
+                  placeholder="0"
+                  required
+                  disabled={isEmployee || isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="warning_quantity"
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Warning Quantity
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name="warning_quantity"
+                  id="warning_quantity"
+                  value={formData.warning_quantity}
+                  onChange={handleChange}
+                  min="0"
+                  max={formData.recommended_quantity}
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40"
+                  placeholder="0"
+                  required
+                  disabled={isEmployee || isSubmitting}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="category"
+                  className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Category
+                </label>
+                <select
+                  name="category"
+                  id="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="mt-2 w-full appearance-none rounded-2xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-700 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-slate-800/60 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-500/40"
+                  required
+                  disabled={isSubmitting}
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-          </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-200 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200 dark:border-white/10 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 px-6 py-2 text-sm font-semibold text-white shadow shadow-indigo-500/40 transition hover:from-indigo-400 hover:via-purple-500 hover:to-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/70 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmitting ? "Saving..." : buttonText}
+              </button>
+            </div>
+          </motion.form>
         </div>
-      </div>
-    </div>
+      </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiAlertTriangle, FiTrendingUp } from "react-icons/fi";
 import UBLogoLight from "../assets/UBlogo-light.png";
@@ -12,6 +12,7 @@ import useLocalStorage from "../utilities/useLocalStorage.jsx";
 import { useAuth } from "../utilities/AuthProvider.jsx";
 import DarkModeToggle from "../utilities/DarkModeToggle.jsx";
 import AuthLayout from "../components/AuthLayout.jsx";
+import ToastStack from "../components/ToastStack.jsx";
 
 function Login() {
   const { currentTheme } = useDarkMode();
@@ -19,17 +20,59 @@ function Login() {
   const [email, setEmail] = useLocalStorage("userEmail", "");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [toasts, setToasts] = useState([]);
+  const toastTimeoutsRef = useRef([]);
 
   const { authProviderLogin } = useAuth();
+
+  const dismissToast = (id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    toastTimeoutsRef.current = toastTimeoutsRef.current.filter((entry) => {
+      if (entry.id === id) {
+        window.clearTimeout(entry.timeoutId);
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const pushToast = ({ title, description, tone = "info" }) => {
+    const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    setToasts((prev) => [...prev, { id, title, description, tone }]);
+
+    const timeoutId = window.setTimeout(() => {
+      dismissToast(id);
+    }, 5000);
+
+    toastTimeoutsRef.current.push({ id, timeoutId });
+  };
+
+  useEffect(() => () => {
+    toastTimeoutsRef.current.forEach(({ timeoutId }) => window.clearTimeout(timeoutId));
+  }, []);
 
   const handleLogin = async (event) => {
     event.preventDefault();
     setLoginError("");
     const loginResponse = await authProviderLogin(email, password);
     if (loginResponse === true) {
-      navigate("/");
+      pushToast({
+        tone: "success",
+        title: "Welcome back",
+        description: "You have signed in successfully.",
+      });
+      window.setTimeout(() => navigate("/"), 600);
     } else {
-      setLoginError(loginResponse);
+      const message =
+        typeof loginResponse === "string" && loginResponse.trim().length > 0
+          ? loginResponse
+          : "We couldn’t verify those credentials.";
+      setLoginError(message);
+      pushToast({
+        tone: "error",
+        title: "Sign in failed: Incorrect Username or Password",
+        description: message,
+      });
     }
   };
 
@@ -83,6 +126,7 @@ function Login() {
 
   return (
     <AuthLayout aside={asideContent}>
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -110,12 +154,12 @@ function Login() {
           </div>
         </div>
 
-        {loginError && (
+        {/* {loginError && (
           <div className="flex items-start gap-3 rounded-3xl border border-rose-200/70 bg-rose-50/80 p-4 text-sm text-rose-700 shadow-sm transition-all duration-500 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
             <FiAlertTriangle className="mt-0.5 h-5 w-5" />
             <p>{loginError}</p>
           </div>
-        )}
+        )} */}
 
         <form className="flex flex-col gap-5" onSubmit={handleLogin}>
           <div className="flex flex-col gap-2">

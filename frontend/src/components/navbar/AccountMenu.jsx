@@ -40,19 +40,19 @@ export default function AccountMenu() {
         aria-haspopup="true"
         aria-expanded={isDropdownOpen}
       >
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white bg-gray-700">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition dark:border-white/10 dark:bg-white/10 dark:text-white">
           {fullName
             .split(" ")
             .map((n) => n[0])
             .join("")}
         </div>
         <div className="flex items-center truncate">
-          <span className="truncate ml-2 text-sm font-medium text-gray-700 dark:text-slate-300 group-hover:text-slate-400 dark:group-hover:text-white">
+          <span className="truncate ml-2 text-sm font-medium text-slate-700 transition group-hover:text-slate-900 dark:text-slate-200 dark:group-hover:text-white">
             {fullName} <span className="uppercase decoration-auto text-xs font-normal"> ({role})</span>
           </span>
 
           <svg
-            className="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400"
+            className="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400 group-hover:text-slate-600 dark:text-slate-400 dark:group-hover:text-white"
             viewBox="0 0 12 12"
           >
             <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
