@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiAlertTriangle, FiTrendingUp } from "react-icons/fi";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import UBLogoLight from "../assets/UBlogo-light.png";
 import UBLogoDark from "../assets/UBlogo-dark.png";
 import Home2Logo from "../assets/Home2_Suites_by_Hilton_logo.png";
@@ -19,6 +20,7 @@ function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useLocalStorage("userEmail", "");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [toasts, setToasts] = useState([]);
   const toastTimeoutsRef = useRef([]);
@@ -187,16 +189,30 @@ function Login() {
             >
               Password
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              name="password"
-              id="password"
-              placeholder="••••••••"
-              className="block w-full rounded-2xl border border-transparent bg-white/80 px-4 py-3 text-sm text-slate-900 shadow-inner shadow-slate-200/60 transition-all duration-300 placeholder:text-slate-400 focus:border-emerald-400/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400/50 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-emerald-400/70 dark:focus:bg-slate-900/60"
-              required
-            />
+            <div className="relative flex items-center">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                id="password"
+                placeholder="••••••••"
+                className="block w-full rounded-2xl border border-transparent bg-white/80 px-4 py-3 pr-12 text-sm text-slate-900 shadow-inner shadow-slate-200/60 transition-all duration-300 placeholder:text-slate-400 focus:border-emerald-400/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400/50 dark:bg-slate-800/60 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-emerald-400/70 dark:focus:bg-slate-900/60"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-transparent text-slate-400 transition hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 dark:text-slate-400 dark:hover:text-slate-200"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <label className="flex cursor-pointer select-none items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/70 px-3 py-2 text-sm text-slate-600 transition-all duration-300 hover:border-emerald-300/70 dark:border-slate-700/60 dark:bg-slate-800/40 dark:text-slate-300">
