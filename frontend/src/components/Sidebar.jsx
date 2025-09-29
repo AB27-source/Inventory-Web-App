@@ -257,15 +257,11 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </svg>
               </button>
 
-              <NavLink
-                end
-                to="/"
-                className="flex w-full items-center justify-center"
-              >
+              <NavLink end to="/" className="flex w-full">
                 {collapsed ? (
                   <img
                     src={UB}
-                    className="mx-auto h-9 w-auto"
+                    className="mx-auto h-9 w-auto items-center justify-center"
                     alt="UB Collapsed Logo"
                   />
                 ) : (
@@ -317,54 +313,61 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                     const Icon = link.icon;
                     return (
                       <li key={link.to}>
-                        <NavLink
-                          end
-                          to={link.to}
-                          aria-label={link.label}
-                          className={({ isActive }) =>
-                            [
-                              // keep a consistent layout shell to avoid jumps
-                              "group relative flex w-full items-center rounded-lg px-3 py-2 gap-3 justify-start",
-                              "transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70",
-                              isActive
-                                ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-200"
-                                : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60",
-                            ].join(" ")
-                          }
+                        <motion.div
+                          layout
+                          transition={{
+                            layout: { duration: 0.28, ease: [0.2, 0.8, 0.2, 1] },
+                          }}
+                          className="w-full"
                         >
-                          <motion.span
-                            layout="position"
-                            className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
-                            whileHover={{ scale: 1.05 }}
+                          <NavLink
+                            end
+                            to={link.to}
+                            aria-label={link.label}
+                            className={({ isActive }) =>
+                              navLinkClassName(isActive)
+                            }
                           >
-                            <Icon className="h-6 w-6" aria-hidden="true" />
-                          </motion.span>
+                            <motion.span
+                              layout
+                              transition={{
+                                layout: {
+                                  duration: 0.28,
+                                  ease: [0.2, 0.8, 0.2, 1],
+                                },
+                              }}
+                              className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md"
+                              whileHover={{ scale: 1.05 }}
+                            >
+                              <Icon className="h-6 w-6" aria-hidden="true" />
+                            </motion.span>
 
-                          {/* KEEP label mounted; animate it closed */}
-                          <motion.span
-                            layout="position"
-                            initial={false}
-                            animate={{
-                              maxWidth: collapsed ? 0 : 180, // tune 180 to your width
-                              opacity: collapsed ? 0 : 1,
-                              x: collapsed ? -6 : 0,
-                            }}
-                            transition={{
-                              duration: 0.25,
-                              ease: [0.2, 0.8, 0.2, 1],
-                            }}
-                            className="overflow-hidden whitespace-nowrap"
-                          >
-                            {link.label}
-                          </motion.span>
-
-                          {/* optional tooltip stays the same */}
-                          {collapsed && (
-                            <span className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs text-white opacity-0 shadow-md transition group-hover:opacity-100">
+                            {/* KEEP label mounted; animate it closed */}
+                            <motion.span
+                              layout="position"
+                              initial={false}
+                              animate={{
+                                maxWidth: collapsed ? 0 : 180, // tune 180 to your width
+                                opacity: collapsed ? 0 : 1,
+                                x: collapsed ? -6 : 0,
+                              }}
+                              transition={{
+                                duration: 0.25,
+                                ease: [0.2, 0.8, 0.2, 1],
+                              }}
+                              className="overflow-hidden whitespace-nowrap"
+                            >
                               {link.label}
-                            </span>
-                          )}
-                        </NavLink>
+                            </motion.span>
+
+                            {/* optional tooltip stays the same */}
+                            {collapsed && (
+                              <span className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-md bg-slate-800 px-2 py-1 text-xs text-white opacity-0 shadow-md transition group-hover:opacity-100">
+                                {link.label}
+                              </span>
+                            )}
+                          </NavLink>
+                        </motion.div>
                       </li>
                     );
                   })}
@@ -387,6 +390,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </AnimatePresence>
                 <div className="mt-3 space-y-2">
                   <motion.button
+                    layout
+                    transition={{
+                      layout: { duration: 0.28, ease: [0.2, 0.8, 0.2, 1] },
+                    }}
                     type="button"
                     onClick={handleCategoriesToggle}
                     className={categoriesButtonClasses + " relative"}
